@@ -148,7 +148,14 @@ class NGLess(object):
     def assign(self, var, expr):
         self.add_expression(Assignment(var, expr))
 
-    def __call__(self, fname, arg, **kwargs):
+    def __getattr__(self, name):
+        if name.endswith('_'):
+            def make_call(arg, **kwargs):
+                return self.function_call(name[:-1], arg, **kwargs)
+            return make_call
+        raise AttributeError('Unknown attribute')
+
+    def function_call(self, fname, arg, **kwargs):
         e = FunctionCall(fname, arg, kwargs, None)
         if not is_pure(fname):
             self.add_expression(e)
