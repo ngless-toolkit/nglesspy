@@ -1,3 +1,5 @@
+import os
+
 class NGLessVariable(object):
     def __init__(self, name):
         self.name = name
@@ -135,8 +137,20 @@ class NGLess(object):
             raise ValueError("Using is missing")
         return PreprocessCall(self, sample, keep_singles).using(using)
 
-    def run(self):
-        print(self.generate())
+    def run(self, auto_install=True, verbose=True):
+        import tempfile
+        import subprocess
+        if auto_install:
+            from . import install
+            install.install_ngless(verbose=verbose)
+        with tempfile.NamedTemporaryFile('w+', suffix='.ngl', delete=False) as tfile:
+            try:
+                tfile.write(self.generate())
+                print(self.generate())
+                tfile.close()
+                subprocess.run(['ngless', tfile.name])
+            finally:
+                os.unlink(tfile.name)
 
     def generate(self):
         from six import StringIO
