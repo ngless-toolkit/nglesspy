@@ -29,7 +29,7 @@ class Literal(object):
         self.val = val
 
     def generate(self):
-        return str(self.val)
+        return encode_value(self.val)
 
 def encode_kwargs(kwargs):
     if not kwargs: return ''
@@ -40,7 +40,12 @@ def encode_value(val):
         if val[0] == '{' and val[-1] == '}':
             return val
         return '"{}"'.format(val)
+    if isinstance(val, list):
+        blocks = [encode_value(v) for v in val]
+        return '[' + ', '.join(blocks) + ']'
     return str(val)
+
+
 class FunctionCall(object):
     def __init__(self, fname, arg, kwargs, block):
         if isinstance(arg, str) or isinstance(arg, int):
