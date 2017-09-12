@@ -9,6 +9,13 @@ touch](mailto:coelho@embl.de) if you want to use it in your work. For
 questions, you can also use the [ngless mailing
 list](https://groups.google.com/forum/#!forum/ngless).
 
+## Dependencies
+
+- [requests](http://docs.python-requests.org/)
+- [NGLess](http://ngless.rtfd.io/)
+
+NGLesspy can auto-install ngless if it needs to.
+
 ## Example
 
 ```python
