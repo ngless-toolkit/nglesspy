@@ -1,12 +1,43 @@
 import os
 
-class NGLessVariable(object):
+class NGLessExpression(object):
+    def generate(self):
+        raise NotImplementedError("No generate function")
+
+class NGLessValue(NGLessExpression):
+    def __lt__(self, other):
+        return BinaryOp('<', self, other)
+
+    def __gt__(self, other):
+        return BinaryOp('>', self, other)
+
+class NGLessVariable(NGLessValue):
     def __init__(self, name):
         self.name = name
 
     def generate(self):
         return self.name
 
+
+class NGLessKeyword(NGLessExpression):
+    def __init__(self, keyword):
+        self.keyword = keyword
+
+    def generate(self):
+        return self.keyword
+
+
+class IFExpression(NGLessExpression):
+    def __init__(self, cond, ifTrue, ifFalse):
+        self.cond = cond
+        self.ifTrue = ifTrue
+        self.ifFalse = ifFalse
+
+    def generate(self):
+        else_clause = ''
+        if self.ifFalse is not None:
+            else_clause = ['else: ', self.ifFalse.generate()]
+        return 'if ' + encode_value(self.cond) + ': ' + self.ifTrue.generate()
 
 class ExpressionList(object):
     def __init__(self, exprs):
@@ -23,10 +54,10 @@ class Block(object):
     def generate(self):
         c = ' using |{}|:\n'.format(self.bvar.name)
         for e in self.block:
-            c += '    ' + e.generate()
+            c += '    ' + e.generate() + '\n'
         return c
 
-class Literal(object):
+class Literal(NGLessValue):
     def __init__(self, val):
         self.val = val
 
@@ -38,6 +69,8 @@ def encode_kwargs(kwargs):
     return ', ' + ', '.join(['{}={}'.format(k, encode_value(v)) for k,v in kwargs.items()])
 
 def encode_value(val):
+    if isinstance(val, NGLessExpression):
+        return val.generate()
     if isinstance(val, str):
         if val[0] == '{' and val[-1] == '}':
             return val
@@ -48,7 +81,7 @@ def encode_value(val):
     return str(val)
 
 
-class FunctionCall(object):
+class FunctionCall(NGLessValue):
     def __init__(self, fname, arg, kwargs, block):
         if isinstance(arg, str) or isinstance(arg, int):
             arg = Literal(arg)
@@ -62,6 +95,15 @@ class FunctionCall(object):
         if self.block is not None:
             block_code = self.block.generate()
         return "{}({}{}){}".format(self.fname, self.arg.generate(), encode_kwargs(self.kwargs), block_code)
+
+class BinaryOp(NGLessValue):
+    def __init__(self, op, right, left):
+        self.op = op
+        self.right = right
+        self.left = left
+
+    def generate(self):
+        return encode_value(self.right) + ' ' + self.op + ' ' + encode_value(self.left)
 
 class Assignment(object):
     def __init__(self, var, e):
@@ -99,7 +141,12 @@ class PreprocessCall(object):
             env = NGLessEnvironment(self)
             r = self.orig.generate_variable()
             r.name = name
+            # Some surgery to redirect expressions to the block before calling
+            # the inner function:
+            orig_script = self.orig.script
+            self.orig.script = self.block_code
             f(env)
+            self.orig.script = orig_script
             self.orig.add_expression(FunctionCall('preprocess', self.sample, {'keep_singles' : self.keep_singles}, Block(r, self.block_code)))
         return block
 
@@ -131,6 +178,17 @@ class NGLess(object):
         n = 'var_{}'.format(self.nextvarix)
         self.nextvarix += 1
         return NGLessVariable(n)
+
+    def paired_(self, sample1, sample2, **kwargs):
+        kwargs['second'] = sample2
+        return FunctionCall('paired', sample1, kwargs, None)
+
+
+    def if_(self, cond, ifTrue, ifFalse=None):
+        self.add_expression(IFExpression(cond, ifTrue, ifFalse))
+
+    discard_ = NGLessKeyword('discard')
+    continue_ = NGLessKeyword('continue')
 
     def preprocess_(self, sample, keep_singles=True, using=None):
         if using is None:
