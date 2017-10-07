@@ -115,19 +115,19 @@ class Assignment(object):
 
 class NGLessEnvironment(object):
     def __init__(self, orig):
-        self.orig = orig
-        self.vars = {}
+        self._nglenv__orig = orig
+        self._nglenv__vars = {}
 
     def __getattr__(self, name):
-        if name not in self.vars:
-            self.vars[name] = NGLessVariable(name)
-        return self.vars[name]
+        if name not in self._nglenv__vars:
+            self._nglenv__vars[name] = NGLessVariable(name)
+        return self._nglenv__vars[name]
 
     def __setattr__(self, name, val):
-        if name == 'vars' or name == 'orig':
+        if name == '_nglenv__vars' or name == '_nglenv__orig':
             object.__setattr__(self, name, val)
         else:
-            self.orig.assign(self.__getattr__(name), val)
+            self._nglenv__orig.assign(self.__getattr__(name), val)
 
 class PreprocessCall(object):
     def __init__(self, orig, sample, keep_singles):
