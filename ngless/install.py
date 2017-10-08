@@ -5,10 +5,11 @@ import requests
 NGLESS_DOWNLOAD_URL = 'http://vm-lux.embl.de/~coelho/ngless-data/releases/ngless-0.0.0-unreleased-Linux64'
 
 def _http_download_file(url, ofile):
+    '''Download from `url` to `ofile`'''
     from contextlib import closing
     with closing(requests.get(url, stream=True)) as ifile, \
                 open(ofile, 'wb') as ofile:
-        for chunk in ifile.iter_content():
+        for chunk in ifile.iter_content(8192):
             ofile.write(chunk)
 
 def _find_target(mode, target):
