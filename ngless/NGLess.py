@@ -320,10 +320,13 @@ class NGLess(object):
 
     def __getattr__(self, name):
         if name.endswith('_'):
-            def make_call(arg, **kwargs):
-                return self.function_call(name[:-1], arg, **kwargs)
-            return make_call
+            return self.function(name[:-1])
         raise AttributeError('Unknown attribute')
+
+    def function(self, fname):
+        def make_call(arg, **kwargs):
+            return self.function_call(fname, arg, **kwargs)
+        return make_call
 
     def function_call(self, fname, arg, **kwargs):
         e = FunctionCall(fname, arg, kwargs, None)
