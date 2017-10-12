@@ -21,6 +21,7 @@
 #  THE SOFTWARE.
 
 from __future__ import division
+from glob import glob
 try:
     import setuptools
 except:

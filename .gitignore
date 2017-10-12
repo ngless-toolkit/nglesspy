@@ -1,2 +1,5 @@
 /build/
 *.pyc
+/.tox/
+/dist/
+/NGLesspy.egg-info/
