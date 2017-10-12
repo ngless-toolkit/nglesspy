@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-from __future__ import print_function
-
-from subprocess import Popen
 import sys
-import tempfile
-from ngless.wrap import ngl_prepare_options, ngl_prepare_payload
+from ngless import NGLess
 
 try:
     import argparse
@@ -27,49 +22,20 @@ def parse_args():
     return parser.parse_args()
 
 
-def prepare(args):
-    # NOTE this needs to match the arguments in parse_args and the targets in payload
-    # commas at the beginning of each option are used when that section has
-    # parameters from other functions.
-    options = {
-        "input_opts": {
-            "input": "'{input}'",
-        },
-        "write_opts": {
-            "output": ", ofile='{output}'",
-        },
-    }
+def ngless_mapstats(args):
+    sc = NGLess.NGLess('0.0')
+    e = sc.env
+    e.samfile = sc.samfile_(args.input)
+    e.stats = sc.mapstats_(e.samfile)
+    sc.write_(e.counts_,
+                ofile=args.output)
 
-    ngl_options = ngl_prepare_options(args, options)
-
-    payload_tpl = """\
-ngless "0.0"
-mapped = samfile({input_opts})
-stats = mapstats(mapped)
-write(stats{write_opts})
-""".format(**ngl_options)
-
-    return ngl_prepare_payload(args, payload_tpl)
-
-
-def ngless(args):
-    payload = prepare(args)
-
-    with tempfile.NamedTemporaryFile() as script:
-        script.write(payload.encode("utf8"))
-        script.flush()
-
-        p = Popen(["ngless", script.name])
-        p.communicate()
-
-    if p.returncode:
-        sys.stderr.write("ERROR: ngless failed with exit code {0}\n".format(p.returncode))
-        sys.exit(p.returncode)
+    sc.run(verbose=args.debug)
 
 
 def main():
     args = parse_args()
-    ngless(args)
+    ngless_mapstats(args)
 
 
 if __name__ == "__main__":

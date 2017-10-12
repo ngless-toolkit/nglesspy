@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-
-from subprocess import Popen
 import sys
-import tempfile
-from ngless.wrap import ngl_prepare_options, ngl_prepare_payload
+from ngless import NGLess
 
 try:
     import argparse
@@ -49,58 +45,30 @@ def parse_args():
     return args
 
 
-def prepare(args):
-    # NOTE this needs to match the arguments in parse_args and the targets in payload
-    # commas at the beginning of each option are used when that section has
-    # parameters from other functions.
-    options = {
-        "input_opts": {
-            "input": "'{input}'",
-            "input_reverse": "'{input_reverse}'",
-            "input_singles": "singles='{input_singles}'",
-        },
-        "write_opts": {
-            "output": ", ofile='{output}'",
-        },
-        "target_name": {
-            "target": "{target}",
-        },
-        "target_opts": {
-            "reference": ", reference='{reference}'",
-            "fasta": ", fafile='{fasta}'",
-        },
-    }
+def ngless_map(args):
+    sc = NGLess.NGLess('0.0')
+    e = sc.env
+    if args.input_reverse:
+        paired_args = {}
+        if args.input_singles:
+            paired_args['singles'] = args.input_singles
+        e.input = sc.paired_(args.input, args.input_reverse, **paired_args)
+    else:
+        e.input = sc.fastq_(args.input)
+    if args.reference:
+        map_opts = {'reference': args.reference}
+    elif args.fasta:
+        map_opts = {'fafile': args.fasta}
+    else:
+        raise ValueError("Missing argument. Either --reference or --fasta must be used")
+    e.mapped = sc.map_(e.input, **map_opts)
+    sc.write_(e.mapped,
+                ofile=args.output)
 
-    ngl_options = ngl_prepare_options(args, options)
-
-    payload_tpl = """\
-ngless "0.0"
-input = {target_name}({input_opts})
-mapped = map(input{target_opts})
-write(mapped{write_opts})
-""".format(**ngl_options)
-
-    return ngl_prepare_payload(args, payload_tpl)
-
-
-def ngless(args):
-    payload = prepare(args)
-
-    with tempfile.NamedTemporaryFile() as script:
-        script.write(payload.encode("utf8"))
-        script.flush()
-
-        p = Popen(["ngless", script.name])
-        p.communicate()
-
-    if p.returncode:
-        sys.stderr.write("ERROR: ngless failed with exit code {0}\n".format(p.returncode))
-        sys.exit(p.returncode)
-
+    sc.run(verbose=args.debug)
 
 def main():
-    args = parse_args()
-    ngless(args)
+    ngless_map(parse_args())
 
 
 if __name__ == "__main__":

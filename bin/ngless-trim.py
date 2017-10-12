@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-
-from subprocess import Popen
 import sys
-import tempfile
-from ngless.wrap import ngl_prepare_options, ngl_prepare_payload
+from ngless import NGLess
 
 try:
     import argparse
@@ -34,61 +30,25 @@ def parse_args():
     return parser.parse_args()
 
 
-def prepare(args):
-    # NOTE this needs to match the arguments in parse_args and the targets in payload
-    # commas at the beginning of each option are used when that section has
-    # parameters from other functions.
-    options = {
-        "fastq_opts": {
-            "input": "'{input}'",
-        },
-        "write_opts": {
-            "output": ", ofile='{output}'",
-        },
-        "method_name": {
-            "method": "{method}",
-        },
-        "method_opts": {
-            "min_quality": ", min_quality={min_quality}",
-        },
-        "discard_opts": {
-            "discard": "{discard}",
-        },
-    }
+def ngless_trim(args):
+    sc = NGLess.NGLess('0.0')
+    e = sc.env
+    e.input = sc.fastq_(args.input)
 
-    ngl_options = ngl_prepare_options(args, options)
+    @sc.preprocess_(e.input, using='r')
+    def proc(bk):
+        bk.r = sc.function(args.method)(bk.r, min_quality=args.min_quality)
+        sc.if_(sc.len_(e.r) < args.discard,
+                sc.discard_)
 
-    payload_tpl = """\
-ngless "0.0"
-input = fastq({fastq_opts})
-preprocess(input) using |read|:
-    read = {method_name}(read{method_opts})
-    if len(read) < {discard_opts}:
-        discard
-write(input{write_opts})
-""".format(**ngl_options)
+    sc.write_(e.inputs_,
+                ofile=args.output)
 
-    return ngl_prepare_payload(args, payload_tpl)
-
-
-def ngless(args):
-    payload = prepare(args)
-
-    with tempfile.NamedTemporaryFile() as script:
-        script.write(payload.encode("utf8"))
-        script.flush()
-
-        p = Popen(["ngless", script.name])
-        p.communicate()
-
-    if p.returncode:
-        sys.stderr.write("ERROR: ngless failed with exit code {0}\n".format(p.returncode))
-        sys.exit(p.returncode)
-
+    sc.run(verbose=args.debug)
 
 def main():
     args = parse_args()
-    ngless(args)
+    ngless_trim(args)
 
 
 if __name__ == "__main__":

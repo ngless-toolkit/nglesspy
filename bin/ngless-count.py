@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from __future__ import print_function
-
-from subprocess import Popen
 import sys
-import tempfile
-from ngless.wrap import ngl_prepare_options, ngl_prepare_payload
+from ngless import NGLess
 
 try:
     import argparse
@@ -32,52 +28,26 @@ def parse_args():
     return parser.parse_args()
 
 
-def prepare(args):
-    # NOTE this needs to match the arguments in parse_args and the targets in payload
-    # commas at the beginning of each option are used when that section has
-    # parameters from other functions. The keys are iterated in alphabetical order
-    # so only the first needs to have a comma.
-    options = {
-        "sam_opts": {
-            "input": "'{input}'",
-        },
-        "count_opts": {
-            "features": ", features=['seqname']",
-            "multiple": "multiple={{{multiple}}}",
-        },
-        "write_opts": {
-            "output": ", ofile='{output}'",
-        },
-    }
-
-    ngl_options = ngl_prepare_options(args, options)
-
-    payload_tpl = """\
-ngless "0.0"
-write(count(samfile({sam_opts}){count_opts}){write_opts})\
-""".format(**ngl_options)
-
-    return ngl_prepare_payload(args, payload_tpl)
+def ngless_count(args):
+    sc = NGLess.NGLess('0.0')
+    e = sc.env
+    e.samfile = sc.samfile_(args.input)
 
 
-def ngless(args):
-    payload = prepare(args)
+    feature = 'seqname'
+    if args.features:
+        feature = args.feature
+    e.counts = sc.count_(e.samfile,
+                            features=[feature],
+                            multiple='{'+args.multiple+'}')
+    sc.write_(e.counts_,
+                ofile=args.output)
 
-    with tempfile.NamedTemporaryFile() as script:
-        script.write(payload.encode("utf8"))
-        script.flush()
-
-        p = Popen(["ngless", script.name])
-        p.communicate()
-
-    if p.returncode:
-        sys.stderr.write("ERROR: ngless failed with exit code {0}\n".format(p.returncode))
-        sys.exit(p.returncode)
-
+    sc.run(verbose=args.debug)
 
 def main():
     args = parse_args()
-    ngless(args)
+    ngless_count(args)
 
 
 if __name__ == "__main__":
