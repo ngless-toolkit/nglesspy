@@ -54,13 +54,33 @@ class NGLessExpression(object):
         raise NotImplementedError("No generate function")
 
 class NGLessValue(NGLessExpression):
+    '''Represents a type which can be used for binary operations'''
     def __lt__(self, other):
         return BinaryOp('<', self, other)
+
+    def __le__(self, other):
+        return BinaryOp('<=', self, other)
 
     def __gt__(self, other):
         return BinaryOp('>', self, other)
 
+    def __ge__(self, other):
+        return BinaryOp('>=', self, other)
+
+    def __add__(self, other):
+        return BinaryOp('+', self, other)
+
+    def __mul__(self, other):
+        return BinaryOp('*', self, other)
+
+    def __div__(self, other):
+        return BinaryOp('/', self, other)
+
+    def __sub__(self, other):
+        return BinaryOp('-', self, other)
+
 class NGLessVariable(NGLessValue):
+    '''Variable in NGLess'''
     def __init__(self, name):
         self.name = name
 
@@ -77,6 +97,7 @@ class NGLessKeyword(NGLessExpression):
 
 
 class IFExpression(NGLessExpression):
+    '''Represents an if expression'''
     def __init__(self, cond, ifTrue, ifFalse):
         self.cond = cond
         self.ifTrue = ifTrue
@@ -196,7 +217,12 @@ class PreprocessCall(object):
             self.orig.script = self.block_code
             f(env)
             self.orig.script = orig_script
-            self.orig.add_expression(FunctionCall('preprocess', self.sample, {'keep_singles' : self.keep_singles}, Block(r, self.block_code)))
+            self.orig.add_expression(
+                    FunctionCall(
+                            'preprocess', self.sample,
+                            {'keep_singles' : self.keep_singles},
+                            Block(r, self.block_code)))
+
         return block
 
     def add_expression(self, e):
@@ -206,7 +232,9 @@ class PreprocessCall(object):
         self.add_expression(Assignment(var, expr))
 
 
-def is_pure(fname):
+def _is_pure_ngless_function(fname):
+    '''Whether the given ngless function is pure (i.e., does not need to be
+    assigned to a variable)'''
     return fname not in ["write"]
 
 class NGLess(object):
@@ -245,6 +273,21 @@ class NGLess(object):
         return PreprocessCall(self, sample, keep_singles).using(using)
 
     def run(self, auto_install=True, verbose=True):
+        '''Run the generated script
+
+        Parameters
+        ----------
+        auto_install : bool, optional (default: True)
+            If true, then ngless is installed if not available in the PATH
+            (Unix only).
+
+        verbose: bool, optional (default: True)
+            Whether to print the resulting script before executing it.
+
+        Returns
+        -------
+        None
+        '''
         import tempfile
         import subprocess
         if auto_install:
@@ -260,6 +303,7 @@ class NGLess(object):
                 os.unlink(tfile.name)
 
     def generate(self):
+        '''Generate and return NGLess script'''
         from six import StringIO
         out = StringIO()
         out.write('ngless "{}"\n'.format(self.version))
@@ -283,7 +327,7 @@ class NGLess(object):
 
     def function_call(self, fname, arg, **kwargs):
         e = FunctionCall(fname, arg, kwargs, None)
-        if not is_pure(fname):
+        if not _is_pure_ngless_function(fname):
             self.add_expression(e)
         return e
 
