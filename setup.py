@@ -59,9 +59,12 @@ install_requires = open('requirements.txt').read()
 tests_require = open('tests-requirements.txt').read()
 
 classifiers = [
+'Development Status :: 4 - Beta',
 'Intended Audience :: Developers',
 'Intended Audience :: Science/Research',
 'Topic :: Software Development :: Libraries',
+'Topic :: Scientific/Engineering :: Bio-Informatics',
+'Topic :: Software Development :: Libraries :: Python Modules',
 'Programming Language :: Python',
 'Programming Language :: Python :: 3',
 'Programming Language :: Python :: 3.3',
@@ -69,7 +72,6 @@ classifiers = [
 'Programming Language :: Python :: 3.5',
 'Programming Language :: Python :: 3.6',
 'Operating System :: OS Independent',
-'License :: OSI Approved :: MIT License',
 ]
 
 setuptools.setup(name = 'NGLesspy',
@@ -91,5 +93,7 @@ setuptools.setup(name = 'NGLesspy',
       test_suite = 'nose.collector',
       install_requires = install_requires,
       tests_require = tests_require,
+      scripts=glob("bin/ngless-*.py"),
+      data_files=[("share/commonwl", glob("cwl/*"))],
       )
 
