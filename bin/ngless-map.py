@@ -21,6 +21,8 @@ def parse_args():
                         help="FastQ file with reads to map (singles) - if paired end and unpaired reads exist")
     parser.add_argument("-o", "--output", required=True,
                         help="Output file/path for results")
+    parser.add_argument("--auto-install", action="store_true",
+                        help="Install NGLess if not found in PATH")
     parser.add_argument("--debug", action="store_true",
                         help="Prints the payload before submitting to ngless")
 
@@ -65,7 +67,7 @@ def ngless_map(args):
     sc.write_(e.mapped,
                 ofile=args.output)
 
-    sc.run(verbose=args.debug)
+    sc.run(verbose=args.debug, auto_install=args.auto_install)
 
 def main():
     ngless_map(parse_args())

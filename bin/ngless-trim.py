@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+    parser.add_argument("--auto-install", action="store_true",
+                        help="Install NGLess if not found in PATH")
 # -*- coding: utf-8 -*-
 
 import sys
@@ -24,6 +26,8 @@ def parse_args():
                         help="Minimum quality value")
     parser.add_argument("-d", "--discard", type=int, default=50,
                         help="Discard if shorted than")
+    parser.add_argument("--auto-install", action="store_true",
+                        help="Install NGLess if not found in PATH")
     parser.add_argument("--debug", action="store_true",
                         help="Prints the payload before submitting to ngless")
 
@@ -44,7 +48,7 @@ def ngless_trim(args):
     sc.write_(e.inputs_,
                 ofile=args.output)
 
-    sc.run(verbose=args.debug)
+    sc.run(verbose=args.debug, auto_install=args.auto_install)
 
 def main():
     args = parse_args()

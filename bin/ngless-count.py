@@ -22,6 +22,8 @@ def parse_args():
     parser.add_argument("-m", "--multiple",
                         choices=["dist1", "all1", "1overN", "unique_only"],
                         help="How to handle multiple mappers")
+    parser.add_argument("--auto-install", action="store_true",
+                        help="Install NGLess if not found in PATH")
     parser.add_argument("--debug", action="store_true",
                         help="Prints the payload before submitting to ngless")
 
@@ -43,7 +45,7 @@ def ngless_count(args):
     sc.write_(e.counts_,
                 ofile=args.output)
 
-    sc.run(verbose=args.debug)
+    sc.run(verbose=args.debug, auto_install=args.auto_install)
 
 def main():
     args = parse_args()

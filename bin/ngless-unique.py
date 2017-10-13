@@ -19,6 +19,8 @@ def parse_args():
                         help="Output file/path for results")
     parser.add_argument("-c", "--max-copies",
                         help="Max number of duplicate copies to keep")
+    parser.add_argument("--auto-install", action="store_true",
+                        help="Install NGLess if not found in PATH")
     parser.add_argument("--debug", action="store_true",
                         help="Prints the payload before submitting to ngless")
 
@@ -32,7 +34,7 @@ def ngless_unique(args):
     sc.write_(sc.unique_(e.input,
                         max_copies=(args.max_copies or 1)),
                 ofile=args.output)
-    sc.run(verbose=args.debug)
+    sc.run(verbose=args.debug, auto_install=args.auto_install)
 
 
 def main():
