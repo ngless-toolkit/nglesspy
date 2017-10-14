@@ -50,9 +50,9 @@ def install_ngless(mode='user', target=None, force=False, verbose=True):
     else:
         if sys.platform != 'linux':
             raise NotImplementedError("""
-install_ngless is only implemented on Linux.
+install_ngless is only implemented on Linux (detected platform: {}).
 
-Please see the ngless webpage: http://ngless.embl.de for more information on how to install NGLess on your system.""")
+Please see the ngless webpage: http://ngless.embl.de for more information on how to install NGLess on your system.""".format(sys.platform))
         if verbose:
             print("Downloading file to {}".format(target_path))
         _http_download_file(NGLESS_DOWNLOAD_URL, target_path)

@@ -44,7 +44,6 @@ except:
 
 
 packages = setuptools.find_packages()
-print(packages)
 install_requires = open('requirements.txt').read()
 tests_require = open('tests-requirements.txt').read()
 
@@ -84,6 +83,7 @@ setuptools.setup(name = 'NGLesspy',
               'ngless-select.py = ngless.bin.ngless_select:main',
               'ngless-trim.py = ngless.bin.ngless_trim:main',
               'ngless-unique.py = ngless.bin.ngless_unique:main',
+              'ngless-install.py = ngless.bin.ngless_install:main',
           ],
       },
       test_suite = 'nose.collector',
