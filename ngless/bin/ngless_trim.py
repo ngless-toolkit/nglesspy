@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-    parser.add_argument("--auto-install", action="store_true",
-                        help="Install NGLess if not found in PATH")
 # -*- coding: utf-8 -*-
 
 import sys
