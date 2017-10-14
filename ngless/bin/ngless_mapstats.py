@@ -29,7 +29,7 @@ def ngless_mapstats(args):
     e = sc.env
     e.samfile = sc.samfile_(args.input)
     e.stats = sc.mapstats_(e.samfile)
-    sc.write_(e.counts_,
+    sc.write_(e.stats,
                 ofile=args.output)
 
     sc.run(verbose=args.debug, auto_install=args.auto_install)

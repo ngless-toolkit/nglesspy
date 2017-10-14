@@ -40,10 +40,10 @@ def ngless_trim(args):
     @sc.preprocess_(e.input, using='r')
     def proc(bk):
         bk.r = sc.function(args.method)(bk.r, min_quality=args.min_quality)
-        sc.if_(sc.len_(e.r) < args.discard,
+        sc.if_(sc.len_(bk.r) < args.discard,
                 sc.discard_)
 
-    sc.write_(e.inputs_,
+    sc.write_(e.input,
                 ofile=args.output)
 
     sc.run(verbose=args.debug, auto_install=args.auto_install)

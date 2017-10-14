@@ -19,7 +19,7 @@ def parse_args():
                         help="Output file/path for results")
     parser.add_argument("-f", "--features",
                         help="Feature to count")
-    parser.add_argument("-m", "--multiple", required=True,
+    parser.add_argument("-m", "--multiple",
                         choices=["dist1", "all1", "1overN", "unique_only"],
                         help="How to handle multiple mappers")
     parser.add_argument("--auto-install", action="store_true",
@@ -38,10 +38,13 @@ def ngless_count(args):
 
     feature = 'seqname'
     if args.features:
-        feature = args.feature
+        feature = args.features
+    count_opts = {}
+    if args.multiple:
+        count_opts['multiple'] = '{'+args.multiple+'}'
     e.counts = sc.count_(e.samfile,
                             features=[feature],
-                            multiple='{'+args.multiple+'}')
+                            **count_opts)
     sc.write_(e.counts,
                 ofile=args.output)
 
