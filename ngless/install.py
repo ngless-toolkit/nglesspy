@@ -48,7 +48,7 @@ def install_ngless(mode='user', target=None, force=False, verbose=True):
     if path.exists(target_path) and not force:
         return False
     else:
-        if sys.platform != 'linux':
+        if not sys.platform.startswith('linux'):
             raise NotImplementedError("""
 install_ngless is only implemented on Linux (detected platform: {}).
 
