@@ -298,7 +298,7 @@ class NGLess(object):
                 tfile.write(self.generate())
                 print(self.generate())
                 tfile.close()
-                subprocess.run(['ngless', tfile.name])
+                subprocess.check_call(['ngless', tfile.name])
             finally:
                 os.unlink(tfile.name)
 
