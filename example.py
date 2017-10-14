@@ -10,6 +10,8 @@ e.sample = sc.load_mocat_sample_('testing')
 @sc.preprocess_(e.sample, using='r')
 def proc(bk):
     bk.r = sc.substrim_(bk.r, min_quality=25)
+    sc.if_(sc.len_(bk.r) < 45,
+            sc.discard_)
 
 e.mapped = sc.map_(e.sample, reference='hg19')
 e.mapped = sc.select_(e.mapped, keep_if=['{mapped}'])

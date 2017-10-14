@@ -64,9 +64,9 @@ classifiers = [
 'Operating System :: OS Independent',
 ]
 
-setuptools.setup(name = 'NGLesspy',
+setuptools.setup(name = 'NGLessPy',
       version = __version__,
-      description = 'NGLesspy: Python interface to NGLess',
+      description = 'NGLessPy: Python interface to NGLess',
       long_description = long_description,
       author = 'Luis Pedro Coelho',
       author_email = 'luis@luispedro.org',
