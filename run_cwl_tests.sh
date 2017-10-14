@@ -16,6 +16,6 @@ for script in cwl/*.cwl; do
 done
 
 if [ "$FAILURES" != "0" ]; then
-    echo "Some CWL tests failed"
+    echo "$FAILURES CWL tests failed"
     exit 1
 fi

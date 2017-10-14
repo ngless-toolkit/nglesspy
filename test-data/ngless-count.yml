@@ -2,4 +2,4 @@ input:
   class: File
   path: input.bam
 output: output.bam
-features: genes
+features: seqname
