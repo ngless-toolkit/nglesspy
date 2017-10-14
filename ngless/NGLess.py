@@ -50,7 +50,7 @@ This is equivalent to the NGLess script
 import os
 
 class NGLessExpression(object):
-    def generate(self):
+    def generate(self, indent=''):
         raise NotImplementedError("No generate function")
 
 class NGLessValue(NGLessExpression):
@@ -84,7 +84,7 @@ class NGLessVariable(NGLessValue):
     def __init__(self, name):
         self.name = name
 
-    def generate(self):
+    def generate(self, indent=''):
         return self.name
 
 
@@ -92,8 +92,8 @@ class NGLessKeyword(NGLessExpression):
     def __init__(self, keyword):
         self.keyword = keyword
 
-    def generate(self):
-        return self.keyword
+    def generate(self, indent=''):
+        return indent + self.keyword
 
 
 class IFExpression(NGLessExpression):
@@ -103,35 +103,38 @@ class IFExpression(NGLessExpression):
         self.ifTrue = ifTrue
         self.ifFalse = ifFalse
 
-    def generate(self):
+    def generate(self, indent=''):
         else_clause = ''
         if self.ifFalse is not None:
-            else_clause = ['else: ', self.ifFalse.generate()]
-        return 'if ' + encode_value(self.cond) + ': ' + self.ifTrue.generate()
+            else_clause = (indent + 'else:\n' + self.ifFalse.generate(indent='    ' + indent))
+        return (indent + 'if ' + encode_value(self.cond) + ':\n' +
+                self.ifTrue.generate(indent=indent+'    ') +
+                else_clause)
 
 class ExpressionList(object):
     def __init__(self, exprs):
         self.exprs = exprs
 
-    def generate(self):
-        return [e.generate() for e in self.exprs]
+    def generate(self, indent=''):
+        return '\n'.join([e.generate(indent) for e in self.exprs])
 
 class Block(object):
     def __init__(self, bvar, block):
         self.bvar = bvar
         self.block = block
 
-    def generate(self):
+    def generate(self, indent=''):
         c = ' using |{}|:\n'.format(self.bvar.name)
         for e in self.block:
-            c += '    ' + e.generate() + '\n'
+            e = e.generate(indent='    ')
+            c += e + '\n'
         return c
 
 class Literal(NGLessValue):
     def __init__(self, val):
         self.val = val
 
-    def generate(self):
+    def generate(self, indent=''):
         return encode_value(self.val)
 
 def encode_kwargs(kwargs):
@@ -160,11 +163,28 @@ class FunctionCall(NGLessValue):
         self.kwargs = kwargs
         self.block = block
 
-    def generate(self):
+    def generate(self, indent=''):
         block_code = ''
         if self.block is not None:
-            block_code = self.block.generate()
-        return "{}({}{}){}".format(self.fname, self.arg.generate(), encode_kwargs(self.kwargs), block_code)
+            block_code = self.block.generate(indent=indent)
+        return indent + "{}({}{}){}".format(self.fname, self.arg.generate(), encode_kwargs(self.kwargs), block_code)
+
+class PairedCalled(NGLessValue):
+    def __init__(self, arg1, arg2, kwargs, block):
+        if isinstance(arg1, str) or isinstance(arg2, int):
+            arg1 = Literal(arg1)
+        if isinstance(arg2, str) or isinstance(arg2, int):
+            arg2 = Literal(arg2)
+        self.arg1 = arg1
+        self.arg2 = arg2
+        self.kwargs = kwargs
+        self.block = block
+
+    def generate(self, indent=''):
+        block_code = ''
+        if self.block is not None:
+            block_code = self.block.generate(indent)
+        return indent + "paired({}, {} {}){}".format(self.arg1.generate(), self.arg2.generate(), encode_kwargs(self.kwargs), block_code)
 
 class BinaryOp(NGLessValue):
     def __init__(self, op, right, left):
@@ -172,7 +192,7 @@ class BinaryOp(NGLessValue):
         self.right = right
         self.left = left
 
-    def generate(self):
+    def generate(self, indent=''):
         return encode_value(self.right) + ' ' + self.op + ' ' + encode_value(self.left)
 
 class Assignment(object):
@@ -180,8 +200,8 @@ class Assignment(object):
         self.var = var
         self.expression = e
 
-    def generate(self):
-        return '{} = {}'.format(self.var.name, self.expression.generate())
+    def generate(self, indent=''):
+        return indent + '{} = {}'.format(self.var.name, self.expression.generate())
 
 class NGLessEnvironment(object):
     def __init__(self, orig):
@@ -189,15 +209,20 @@ class NGLessEnvironment(object):
         self._nglenv__vars = {}
 
     def __getattr__(self, name):
-        if name not in self._nglenv__vars:
-            self._nglenv__vars[name] = NGLessVariable(name)
         return self._nglenv__vars[name]
+
+    def _nglenv__create_var(self, name):
+        e = NGLessVariable(name)
+        self._nglenv__vars[name] = e
+        return e
 
     def __setattr__(self, name, val):
         if name == '_nglenv__vars' or name == '_nglenv__orig':
             object.__setattr__(self, name, val)
         else:
-            self._nglenv__orig.assign(self.__getattr__(name), val)
+            if name not in self._nglenv__vars:
+                self._nglenv__create_var(name)
+            self._nglenv__orig.assign(self._nglenv__vars[name], val)
 
 class PreprocessCall(object):
     def __init__(self, orig, sample, keep_singles):
@@ -209,8 +234,7 @@ class PreprocessCall(object):
     def using(self, name):
         def block(f):
             env = NGLessEnvironment(self)
-            r = self.orig.generate_variable()
-            r.name = name
+            e = env._nglenv__create_var(name)
             # Some surgery to redirect expressions to the block before calling
             # the inner function:
             orig_script = self.orig.script
@@ -221,7 +245,7 @@ class PreprocessCall(object):
                     FunctionCall(
                             'preprocess', self.sample,
                             {'keep_singles' : self.keep_singles},
-                            Block(r, self.block_code)))
+                            Block(e, self.block_code)))
 
         return block
 
@@ -257,8 +281,7 @@ class NGLess(object):
         return NGLessVariable(n)
 
     def paired_(self, sample1, sample2, **kwargs):
-        kwargs['second'] = sample2
-        return FunctionCall('paired', sample1, kwargs, None)
+        return PairedCalled(sample1, sample2, kwargs, None)
 
 
     def if_(self, cond, ifTrue, ifFalse=None):
