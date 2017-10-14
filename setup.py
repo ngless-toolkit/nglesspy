@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017, Luis Pedro Coelho <luis@luispedro.org>
+# Copyright (C) 2017, Luis Pedro Coelho <luis@luispedro.org> and Renato Alves <ralves@embl.de>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -43,21 +43,11 @@ except:
 
 
 
-extensions = {
-}
-
-ext_modules = []
-
 packages = setuptools.find_packages()
-
-package_dir = {
-    }
-package_data = {
-    }
-
+print(packages)
 install_requires = open('requirements.txt').read()
-
 tests_require = open('tests-requirements.txt').read()
+
 
 classifiers = [
 'Development Status :: 4 - Beta',
@@ -86,15 +76,19 @@ setuptools.setup(name = 'NGLesspy',
       classifiers = classifiers,
       url = 'http://ngless.embl.de/',
       packages = packages,
-      ext_modules = ext_modules,
-      package_dir = package_dir,
-      package_data = package_data,
       entry_points={
+          'console_scripts' : [
+              'ngless-count.py = ngless.bin.ngless_count:main',
+              'ngless-map.py = ngless.bin.ngless_map:main',
+              'ngless-mapstats.py = ngless.bin.ngless_mapstats:main',
+              'ngless-select.py = ngless.bin.ngless_select:main',
+              'ngless-trim.py = ngless.bin.ngless_trim:main',
+              'ngless-unique.py = ngless.bin.ngless_unique:main',
+          ],
       },
       test_suite = 'nose.collector',
       install_requires = install_requires,
       tests_require = tests_require,
-      scripts=glob("bin/ngless-*.py"),
       data_files=[("share/commonwl", glob("cwl/*"))],
       )
 
