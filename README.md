@@ -16,7 +16,7 @@ list](https://groups.google.com/forum/#!forum/ngless).
 ## Dependencies
 
 - [requests](http://docs.python-requests.org/)
-- [NGLess](http://ngless.rtfd.io/)
+- [NGLess](http://ngless.embl.de)
 
 NGLesspy can auto-install ngless if it needs to.
 
