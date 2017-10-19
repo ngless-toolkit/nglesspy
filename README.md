@@ -23,10 +23,14 @@ NGLesspy can auto-install ngless if it needs to.
 
 ## Example
 
+
 Inside the [bin/](https://github.com/luispedro/nglesspy/tree/master/bin)
 directory, you will find several simple scripts exposing NGLess functionality
 as command line tools. These are also simple examples of how NGLessPy can be
 used.
+
+See the [tutorial](http://ngless.embl.de/nglesspy.html) for a more thorough
+explanation of what is going on in the example below.
 
 ```python
     from ngless import NGLess
