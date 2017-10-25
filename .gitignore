@@ -2,4 +2,4 @@
 *.pyc
 /.tox/
 /dist/
-/NGLesspy.egg-info/
+/NGLessPy.egg-info/
