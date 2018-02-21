@@ -33,15 +33,10 @@ This is equivalent to the NGLess script
 
 
     ngless '0.0'
-    
-
-    
 
     preprocess_(sample) using='r':
-    
 
     mapped = map(sample, reference='hg19')
-    
 
     write(mapped, ofile='ofile.sam')
 '''
@@ -295,7 +290,7 @@ class NGLess(object):
             raise ValueError("Using is missing")
         return PreprocessCall(self, sample, keep_singles).using(using)
 
-    def run(self, auto_install=True, verbose=True):
+    def run(self, auto_install=True, verbose=True, ncpus=None, extra_args=[]):
         '''Run the generated script
 
         Parameters
@@ -306,6 +301,13 @@ class NGLess(object):
 
         verbose: bool, optional (default: True)
             Whether to print the resulting script before executing it.
+
+        ncpus : int or str, optional
+            How many CPUs to use (corresponds to ngless' -j argument).
+            Can be "auto" or an integer.
+
+        extra_args : list of str, optional
+            Extra arguments to pass to ngless
 
         Returns
         -------
@@ -321,7 +323,12 @@ class NGLess(object):
                 tfile.write(self.generate())
                 print(self.generate())
                 tfile.close()
-                subprocess.check_call(['ngless', tfile.name])
+                cmdline = ['ngless', tfile.name]
+                if ncpus:
+                    cmdline.extend(['-j', str(ncpus)])
+                if extra_args:
+                    cmdline.extend(extra_args)
+                subprocess.check_call(cmdline)
             finally:
                 os.unlink(tfile.name)
 
