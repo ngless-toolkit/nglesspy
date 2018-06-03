@@ -10,7 +10,7 @@ API.
 ```python
     from ngless import NGLess
 
-    sc = NGLess.NGLess('0.0')
+    sc = NGLess.NGLess('0.6')
 
     sc.import_('mocat', '0.0')
     e = sc.env
@@ -32,10 +32,13 @@ API.
 This is equivalent to the NGLess script
 
 
-    ngless '0.0'
-
-    preprocess_(sample) using='r':
-
+    ngless '0.6'
+    import "mocat" version "0.0"
+    
+    sample = load_mocat_sample("testing")
+    sample = preprocess(sample) using |r|:
+        r = substrim(r, min_quality=25)
+    
     mapped = map(sample, reference='hg19')
 
     write(mapped, ofile='ofile.sam')
@@ -219,11 +222,12 @@ class NGLessEnvironment(object):
                 self._nglenv__create_var(name)
             self._nglenv__orig.assign(self._nglenv__vars[name], val)
 
-class PreprocessCall(object):
-    def __init__(self, orig, sample, keep_singles):
+class FunctionCallWithBlock(object):
+    def __init__(self, orig, fname, arg, kwargs):
         self.orig = orig
-        self.sample = sample
-        self.keep_singles = keep_singles
+        self.fname = fname
+        self.arg = arg
+        self.kwargs = kwargs
         self.block_code = []
 
     def using(self, name):
@@ -237,10 +241,13 @@ class PreprocessCall(object):
             f(env)
             self.orig.script = orig_script
             self.orig.add_expression(
-                    FunctionCall(
-                            'preprocess', self.sample,
-                            {'keep_singles' : self.keep_singles},
-                            Block(e, self.block_code)))
+                    Assignment(
+                        self.arg,
+                        FunctionCall(
+                            self.fname,
+                            self.arg,
+                            self.kwargs,
+                            Block(e, self.block_code))))
 
         return block
 
@@ -288,7 +295,14 @@ class NGLess(object):
     def preprocess_(self, sample, keep_singles=True, using=None):
         if using is None:
             raise ValueError("Using is missing")
-        return PreprocessCall(self, sample, keep_singles).using(using)
+        return FunctionCallWithBlock(self, 'preprocess', sample, {'keep_singles': keep_singles}).using(using)
+
+    def select_(self, arg, **kwargs):
+        if kwargs.get('using') is not None:
+            return FunctionCallWithBlock(self, 'select', arg, kwargs).using(kwargs.get('using'))
+        return FunctionCall('select', arg, kwargs, None)
+
+
 
     def run(self, auto_install=True, verbose=True, ncpus=None, extra_args=[]):
         '''Run the generated script
