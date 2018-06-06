@@ -20,6 +20,7 @@ list](https://groups.google.com/forum/#!forum/ngless).
 
 NGLesspy can auto-install ngless if it needs to.
 
+NGLesspy is compatible with Python 2.7 and 3.4+.
 
 ## Example
 
