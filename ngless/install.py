@@ -2,7 +2,7 @@ import sys
 from os import path, chmod
 import requests
 
-NGLESS_DOWNLOAD_URL = 'http://vm-lux.embl.de/~coelho/ngless-data/releases/ngless-0.0.0-unreleased-Linux64'
+NGLESS_DOWNLOAD_URL = 'http://ngless.embl.de/releases/ngless-0.8.1-Linux64'
 
 def _http_download_file(url, ofile):
     '''Download from `url` to `ofile`'''
