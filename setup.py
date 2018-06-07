@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2017, Luis Pedro Coelho <luis@luispedro.org> and Renato Alves <ralves@embl.de>
+# Copyright (C) 2017-2018, Luis Pedro Coelho <luis@luispedro.org> and Renato Alves <ralves@embl.de>
 # vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -31,7 +31,6 @@ setuptools not found.
 On linux, the package is often called python-setuptools''')
     from sys import exit
     exit(1)
-import os
 
 exec(compile(open('ngless/nglesspy_version.py').read(),
              'ngless/nglesspy_version.py', 'exec'))
@@ -57,7 +56,6 @@ classifiers = [
 'Topic :: Software Development :: Libraries :: Python Modules',
 'Programming Language :: Python',
 'Programming Language :: Python :: 3',
-'Programming Language :: Python :: 3.3',
 'Programming Language :: Python :: 3.4',
 'Programming Language :: Python :: 3.5',
 'Programming Language :: Python :: 3.6',
@@ -68,6 +66,7 @@ setuptools.setup(name = 'NGLessPy',
       version = __version__,
       description = 'NGLessPy: Python interface to NGLess',
       long_description = long_description,
+      long_description_content_type='text/markdown',
       author = 'Luis Pedro Coelho',
       author_email = 'luis@luispedro.org',
       license = 'MIT',

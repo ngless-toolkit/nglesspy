@@ -1,4 +1,7 @@
-version 0.2 Thu Jun  7 2018 by luispedro
+version 0.2.1 Thu Jun  7 2018 by luispedro
+	* Mark description as markdown so that it is rendered correctly on pypi
+
+version 0.2.0 Thu Jun  7 2018 by luispedro
 	* Add select_ function
 	* Expose ngless command line arguments in NGLess.run()
 	* Update to NGLess 0.8.1
