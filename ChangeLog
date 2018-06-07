@@ -1,5 +1,7 @@
-version 0.1+
+version 0.2 Thu Jun  7 2018 by luispedro
+	* Add select_ function
 	* Expose ngless command line arguments in NGLess.run()
+	* Update to NGLess 0.8.1
 
 version 0.1 Sat Oct 14 2017 by luispedro
 	* First release with basic functionality: create NGLess scripts and simple

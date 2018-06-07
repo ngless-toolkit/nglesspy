@@ -36,7 +36,7 @@ explanation of what is going on in the example below.
 ```python
     from ngless import NGLess
 
-    sc = NGLess.NGLess('0.0')
+    sc = NGLess.NGLess('0.8')
 
     sc.import_('mocat', '0.0')
     e = sc.env
@@ -58,7 +58,7 @@ explanation of what is going on in the example below.
 This is equivalent to the NGLess script
 
 
-    ngless '0.0'
+    ngless '0.8'
     import 'mocat' version '0.0'
 
     sample = load_mocat_sample('testing')
