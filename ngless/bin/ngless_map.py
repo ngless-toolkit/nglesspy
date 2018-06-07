@@ -48,7 +48,7 @@ def parse_args():
 
 
 def ngless_map(args):
-    sc = NGLess.NGLess('0.0')
+    sc = NGLess.NGLess('0.8')
     e = sc.env
     if args.input_reverse:
         paired_args = {}

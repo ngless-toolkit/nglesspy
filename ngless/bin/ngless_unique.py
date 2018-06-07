@@ -28,7 +28,7 @@ def parse_args():
 
 
 def ngless_unique(args):
-    sc = NGLess.NGLess('0.0')
+    sc = NGLess.NGLess('0.8')
     e = sc.env
     e.input = sc.fastq_(args.input)
     sc.write_(sc.unique_(e.input,

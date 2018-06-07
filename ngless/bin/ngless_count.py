@@ -31,7 +31,7 @@ def parse_args():
 
 
 def ngless_count(args):
-    sc = NGLess.NGLess('0.0')
+    sc = NGLess.NGLess('0.8')
     e = sc.env
     e.samfile = sc.samfile_(args.input)
 

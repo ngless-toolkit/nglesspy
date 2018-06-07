@@ -25,7 +25,7 @@ def parse_args():
 
 
 def ngless_mapstats(args):
-    sc = NGLess.NGLess('0.0')
+    sc = NGLess.NGLess('0.8')
     e = sc.env
     e.samfile = sc.samfile_(args.input)
     e.stats = sc.mapstats_(e.samfile)

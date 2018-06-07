@@ -33,7 +33,7 @@ def parse_args():
 
 
 def ngless_trim(args):
-    sc = NGLess.NGLess('0.0')
+    sc = NGLess.NGLess('0.8')
     e = sc.env
     e.input = sc.fastq_(args.input)
 

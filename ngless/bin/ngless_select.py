@@ -36,7 +36,7 @@ def ngless_select(args):
     select_opts = {
             args.action : ['{'+c+'}' for c in args.conditions]
             }
-    sc = NGLess.NGLess('0.0')
+    sc = NGLess.NGLess('0.8')
     e = sc.env
     e.samfile = sc.samfile_(args.input)
     e.selected = sc.select_(e.samfile, **select_opts)
