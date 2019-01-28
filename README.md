@@ -4,9 +4,8 @@ This is a variation of [NGLess](http://ngless.embl.de) as an embedded language
 in Python, thus enabling processing of next generation data through a Python
 API. See the example below.
 
-[![Build Status](https://travis-ci.org/luispedro/nglesspy.svg?branch=master)](https://travis-ci.org/luispedro/nglesspy)
+[![Build Status](https://travis-ci.org/ngless-toolkit/nglesspy.svg?branch=master)](https://travis-ci.org/ngless-toolkit/nglesspy)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/hyperium/hyper/master/LICENSE)
-[![Join the chat at https://gitter.im/luispedro/ngless](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/luispedro/ngless?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 This is **very experimental** and can change at any time. Please [get in
 touch](mailto:coelho@embl.de) if you want to use it in your work. For
