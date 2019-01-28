@@ -62,7 +62,7 @@ This is equivalent to the NGLess script
 
     sample = load_mocat_sample('testing')
 
-    preprocess_(sample) using='r':
+    sample = preprocess(sample) using='r':
         r = substrim(r, min_quality=25)
 
     mapped = map(sample, reference='hg19')
