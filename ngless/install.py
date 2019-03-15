@@ -2,7 +2,7 @@ import sys
 from os import path, chmod
 import requests
 
-NGLESS_DOWNLOAD_URL = 'http://ngless.embl.de/releases/ngless-0.8.1-Linux64'
+NGLESS_DOWNLOAD_URL = 'https://ngless.embl.de/releases/ngless-0.11.0-Linux64'
 
 def _http_download_file(url, ofile):
     '''Download from `url` to `ofile`'''
@@ -52,7 +52,7 @@ def install_ngless(mode='user', target=None, force=False, verbose=True):
             raise NotImplementedError("""
 install_ngless is only implemented on Linux (detected platform: {}).
 
-Please see the ngless webpage: http://ngless.embl.de for more information on how to install NGLess on your system.""".format(sys.platform))
+Please see the ngless webpage: https://ngless.embl.de for more information on how to install NGLess on your system.""".format(sys.platform))
         if verbose:
             print("Downloading file to {}".format(target_path))
         _http_download_file(NGLESS_DOWNLOAD_URL, target_path)

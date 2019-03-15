@@ -1,3 +1,6 @@
+version 0.2.1+
+	* Update NGLess version
+
 version 0.2.1 Thu Jun  7 2018 by luispedro
 	* Mark description as markdown so that it is rendered correctly on pypi
 
