@@ -195,6 +195,14 @@ class BinaryOp(NGLessValue):
     def generate(self, indent=''):
         return encode_value(self.right) + ' ' + self.op + ' ' + encode_value(self.left)
 
+
+class UnaryOp(object):
+    def __init__(self, op, val):
+        self.op = op
+        self.val = val
+    def generate(self, _):
+        return '({} {})'.format(self.op.generate(), self.val.generate())
+
 class Assignment(object):
     def __init__(self, var, e):
         self.var = var
@@ -291,6 +299,8 @@ class NGLess(object):
     def if_(self, cond, ifTrue, ifFalse=None):
         self.add_expression(IFExpression(cond, ifTrue, ifFalse))
 
+    def not_(self, val):
+        return self.add_expression(UnaryOp(NGLessKeyword('not'), val))
     discard_ = NGLessKeyword('discard')
     continue_ = NGLessKeyword('continue')
 
