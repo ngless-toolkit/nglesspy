@@ -1,7 +1,9 @@
+# Copyright (C) 2017-2020, Luis Pedro Coelho <luis@luispedro.org> and Renato Alves <ralves@embl.de>
+# vim: set ts=4 sts=4 sw=4 expandtab smartindent:
 '''
 # NGLessPy: NGLess as a Python Embedded Language
 
-This is a variation of [NGLess](http://ngless.embl.de) as an embedded language
+This is a variation of [NGLess](https://ngless.embl.de) as an embedded language
 in Python, thus enabling processing of next generation data through a Python
 API.
 
@@ -10,9 +12,9 @@ API.
 ```python
     from ngless import NGLess
 
-    sc = NGLess.NGLess('0.6')
+    sc = NGLess.NGLess('1.2')
+    sc.import_('mocat', '1.0')
 
-    sc.import_('mocat', '0.0')
     e = sc.env
 
     e.sample = sc.load_mocat_sample_('testing')
@@ -32,8 +34,8 @@ API.
 This is equivalent to the NGLess script
 
 
-    ngless '0.6'
-    import "mocat" version "0.0"
+    ngless '1.2'
+    import "mocat" version "1.0"
     
     sample = load_mocat_sample("testing")
     sample = preprocess(sample) using |r|:
